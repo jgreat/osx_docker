@@ -1,0 +1,54 @@
+---
+- hosts: localhost
+  connection: local
+  
+  vars:
+    home: "{{ lookup('env', 'HOME') }}"
+    env:
+      DOCKER_HOST: "tcp://192.168.59.103:2375"
+
+  tasks:
+    - name: install homebrew cask addon
+      homebrew:
+        name: brew-cask
+
+    - name: Install virtualbox
+      homebrew_cask: 
+        name: virtualbox
+
+    - name: Install docker
+      homebrew: 
+        name: docker
+
+    - name: Install vagrant
+      homebrew_cask:
+        name: vagrant
+      register: vagrant_installed
+
+    - name: Setup nfs on current host
+      sudo: yes
+      sudo_user: root
+      lineinfile:
+        dest: /etc/exports
+        line: /Users -maproot=root -network 192.168.59 -mask 255.255.255.0
+        create: yes
+      register: exports_updated
+
+    - name: Restart NFSD
+      sudo: yes
+      sudo_user: root
+      command: nfsd restart
+      when: exports_updated|changed
+
+    - name: Start Vagrant VM
+      command: vagrant up
+
+    - name: Setup docker environment
+      lineinfile:
+        dest: ~/.profile
+        line: "export DOCKER_HOST=tcp://192.168.59.103:2375"
+        create: yes
+
+    - debug:
+        msg: "Restart your shell or run - export DOCKER_HOST=tcp://192.168.59.103:2375"
+    

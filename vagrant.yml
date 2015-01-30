@@ -1,0 +1,59 @@
+---
+- hosts: all
+  sudo: yes
+  sudo_user: root
+
+  tasks:
+    - name: Add /Users
+      file:
+        state: directory
+        path: /Users
+        mode: 0755
+        
+    - name: Add NFS /Users mount
+      lineinfile:
+        dest: /etc/fstab
+        line: "192.168.59.3:/Users /Users nfs defaults,nobootwait 0 0"
+        create: yes
+      register: fstab
+
+    - name: Mount all
+      command: mount -a
+      when: fstab|changed
+
+    - name: Install apt-transport-https
+      apt:
+        name: apt-transport-https
+
+    - name: Install docker.com Apt Key 
+      apt_key:
+        keyserver: keyserver.ubuntu.com
+        id: D8576A8BA88D21E9
+
+    - name: Install docker.com Apt Repo
+      apt_repository:
+        repo: 'deb https://get.docker.com/ubuntu docker main'
+        update_cache: yes 
+    
+    - name: Install aufs
+      apt:
+        name: linux-image-extra-{{ ansible_kernel }}
+
+    - name: Install lxc-docker
+      apt:
+        name: lxc-docker=1.4.1
+      notify: restart docker
+
+    - name: Docker Daemon Options
+      lineinfile:
+        dest: /etc/default/docker
+        regexp: 'DOCKER_OPTS=.*'
+        line: 'DOCKER_OPTS="--host 0.0.0.0:2375 --host unix:///var/run/docker.sock --storage-driver aufs"'
+      notify: restart docker
+
+  handlers:
+    - name: restart docker
+      service: 
+        name: docker
+        state: restarted
+
