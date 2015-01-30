@@ -1,8 +1,12 @@
 # osx_docker
 Ubuntu 14.04 Vagrant image with Ansible setup for OSX, because boot2docker is just too limited.  
   
-This setups up a VM with a static IP running docker, configures and mounts /Users with NFS for full user support, and installs docker for OSX locally and sets the `DOCKER_HOST` environment variable so you can access docker from the OSX cli. 
-  
+This setups up a VM with a static IP running docker, configures and mounts /Users with NFS for full user support, installs docker for OSX locally and sets the `DOCKER_HOST` environment variable so you can access docker from the OSX cli. 
+
+*Why NFS?* VirtualBox shares set the permissions on the share to your uid. That means if docker wants to run a command and write to storate on the /Users share as something other than your uid or 0 (root) it will fail. This was a big pain point for me when trying to use standard packaging for things like RabbitMQ, Redis and others. 
+
+*Why not boot2docker* boot2docker is soooo stripped down that I find provisioning any customizations after its built and installed a hair-pulling experinece. Frankly the 100MB of Ram and 400MB of disk its saving is just not worth the hassel. 
+
 ## Requirements
  * xcode cli tools `xcode-select --install`
  * homebrew http://brew.sh/
@@ -41,5 +45,7 @@ Theses are some of the ways I take advantage of /Users shared via NFS.
  * Set entries in /etc/hosts: `192.168.59.103  www-dev.jgreat.me`
 
 #### Troubleshooting
-Virtualbox _almost_ always sets the virtualbox adapter to 192.168.59.3. If it doesn't go into the VitrualBox GUI -> file -> preferences -> Network -> Host-Only Networks. Change the approprate vboxnet adapter to 192.168.59.3.
+ * ~/.profile sometimes isn't processed on shell startup. Take the `DOCKER_HOST` entry and put it in your .bashrc or someplace it will be processed.
+
+ * Virtualbox _almost_ always sets the virtualbox adapter to 192.168.59.3. If it doesn't go into the VitrualBox GUI -> file -> preferences -> Network -> Host-Only Networks. Change the approprate vboxnet adapter to 192.168.59.3.
  
