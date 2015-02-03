@@ -23,7 +23,7 @@ This playbook will:
  * Install Docker, Vagrant, VirtualBox locally.
  * Configure NFSD to share /Users with the VM.
  * Startup the Vagrant VM.
- * Set `DOCKER_HOST` in ~/.profile
+ * Set `DOCKER_HOST` in ~/.profile, and ~/.bash_profile
 
 The Vagrant VM provisions the vagrant.yml file on startup.
  * Create /Users and mount nfs share.
@@ -32,8 +32,14 @@ The Vagrant VM provisions the vagrant.yml file on startup.
  * Configure docker to allow tcp connections.
 
 ## Using Docker
+ * Make sure the Vagrant VM is started.
  * Run docker commands from the osx console.
 
+#### Starting Vagrant
+`cd <repo>` and run `vagrant up` to start the vm. 
+
+#### Auto-Start Docker Containers
+Run docker contaners with `--restart=always` option to have continers start on `vargrant up`
 
 #### Volume Tricks
 Theses are some of the ways I take advantage of /Users shared via NFS. 
@@ -45,9 +51,16 @@ Theses are some of the ways I take advantage of /Users shared via NFS.
  * Set entries in /etc/hosts: `192.168.59.103  www-dev.jgreat.me`
 
 #### Troubleshooting
- * ~/.profile sometimes isn't processed on shell startup. Take the `DOCKER_HOST` entry and put it in your .bashrc or someplace it will be processed.
-
- * Virtualbox _almost_ always sets the virtualbox adapter to 192.168.59.3. If it doesn't go into the VitrualBox GUI -> file -> preferences -> Network -> Host-Only Networks. Change the appropriate vboxnet adapter to 192.168.59.3.
-
-
+  * If you get `Cannot connect to the Docker daemon.`
+    * Make sure the VM is runing
+    * check to see that `DOCKER_HOST` is set correctly  
+To check:
+```
+$ echo $DOCKER_HOST
+tcp://192.168.59.103:2375
+```
+To set if incorrect:
+```
+$ export DOCKER_HOST=tcp://192.168.59.103:2375
+```
 
