@@ -4,22 +4,34 @@
   sudo_user: root
 
   tasks:
-    - name: Add /Users
-      file:
-        state: directory
-        path: /Users
-        mode: 0755
-        
-    - name: Add NFS /Users mount
-      lineinfile:
-        dest: /etc/fstab
-        line: "192.168.59.3:/Users /Users nfs defaults,nobootwait 0 0"
-        create: yes
-      register: fstab
+    - name: Get Host IP Address
+      shell: "VBoxControl --nologo guestproperty get /VirtualBox/HostInfo/HostOnlyIP 2>/dev/null | awk '{print $2}'" 
+      register: host_ip
 
-    - name: Mount all
-      command: mount -a
-      when: fstab|changed
+    - name: Mount NFS /Users
+      mount:
+        state: mounted
+        src: "{{ host_ip.stdout }}:/Users"
+        name: /Users
+        fstype: nfs
+        opts: defaults,nobootwait
+
+#    - name: Add /Users
+#      file:
+#        state: directory
+#        path: /Users
+#        mode: 0755
+
+#    - name: Add NFS /Users mount
+#      lineinfile:
+#        dest: /etc/fstab
+#        line: "{{ host_ip.stdout }}:/Users /Users nfs defaults,nobootwait 0 0"
+#        create: yes
+#      register: fstab
+
+#    - name: Mount all
+#      command: mount -a
+#      when: fstab|changed
 
     - name: Install apt-transport-https
       apt:
