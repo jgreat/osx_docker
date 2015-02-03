@@ -42,9 +42,6 @@
     - name: Start Vagrant VM
       command: vagrant up
 
-    - name: Get VBox Host IP
-      command: 
-
     - name: Setup docker environment
       lineinfile:
         dest: ~/.profile
