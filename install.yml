@@ -7,12 +7,6 @@
     docker_net: 192.168.59
 
   tasks:
-    - debug :
-        var: docker_net
-
-    - fail:
-        msg: stop
-
     - name: install homebrew cask addon
       homebrew:
         name: brew-cask
