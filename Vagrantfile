@@ -15,8 +15,8 @@ Vagrant.configure(2) do |config|
     # Setup hostonly network
     vboxnet = /'.*'/.match(`VBoxManage hostonlyif create 2>/dev/null`).to_s
     puts vboxnet
-    `VBoxManage hostonlyif ipconfig #{vboxnet} --ip 192.168.59.1 2>/dev/null`
-    host_ip = "192.168.59.1"
+    `VBoxManage hostonlyif ipconfig #{vboxnet} --ip #{vm_network}.1 2>/dev/null`
+    host_ip = "#{vm_network}.1"
   end
 
 
@@ -43,6 +43,7 @@ Vagrant.configure(2) do |config|
     
     v.customize ["modifyvm", :id, "--memory", mem]
     v.customize ["modifyvm", :id, "--cpus", cpus]
+    v.customize ["modifyvm", :id, "--name", "osx_docker"]
   end
 
   config.vm.provision "ansible" do |ansible|

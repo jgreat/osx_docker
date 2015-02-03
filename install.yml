@@ -3,11 +3,16 @@
   connection: local
   
   vars:
-    home: "{{ lookup('env', 'HOME') }}"
-    env:
-      DOCKER_HOST: "tcp://192.168.59.103:2375"
+    docker_ip: 192.168.59.103
+    docker_net: 192.168.59
 
   tasks:
+    - debug :
+        var: docker_net
+
+    - fail:
+        msg: stop
+
     - name: install homebrew cask addon
       homebrew:
         name: brew-cask
@@ -30,7 +35,7 @@
       sudo_user: root
       lineinfile:
         dest: /etc/exports
-        line: /Users -maproot=root -network 192.168.59 -mask 255.255.255.0
+        line: /Users -maproot=root -network {{ docker_net }} -mask 255.255.255.0
         create: yes
       register: exports_updated
 
@@ -43,12 +48,21 @@
     - name: Start Vagrant VM
       command: vagrant up
 
+    - name: Get VBox Host IP
+      command: 
+
     - name: Setup docker environment
       lineinfile:
         dest: ~/.profile
-        line: "export DOCKER_HOST=tcp://192.168.59.103:2375"
+        line: export DOCKER_HOST=tcp://{{ docker_ip }}:2375
+        create: yes
+
+    - name: Setup docker environment
+      lineinfile:
+        dest: ~/.bash_profile
+        line: export DOCKER_HOST=tcp://{{ docker_ip }}:2375
         create: yes
 
     - debug:
-        msg: "Restart your shell or run - export DOCKER_HOST=tcp://192.168.59.103:2375"
+        msg: "Restart your shell or run - export DOCKER_HOST=tcp://{{ docker_ip }}:2375"
     
