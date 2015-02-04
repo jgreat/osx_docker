@@ -9,7 +9,8 @@ This setups up a VM with a static IP running docker, configures and mounts /User
 
 ## Requirements
  * xcode cli tools `xcode-select --install`
- * homebrew http://brew.sh/
+ * Homebrew http://brew.sh/
+ * Homebrew Cask `brew install caskroom/cask/brew-cask` 
  * Ansible `brew install ansible`
 
 ## Install

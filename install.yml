@@ -7,10 +7,6 @@
     docker_net: 192.168.59
 
   tasks:
-    - name: install homebrew cask addon
-      homebrew:
-        name: brew-cask
-
     - name: Install virtualbox
       homebrew_cask: 
         name: virtualbox
