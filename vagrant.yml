@@ -55,6 +55,11 @@
       apt:
         name: lxc-docker
       notify: restart docker
+    
+    - name: Remove /etc/init.d/docker (bug in docker.com package)
+      file:
+        path: /etc/init.d/docker
+        state: absent
 
     - name: Docker Daemon Options
       lineinfile:
