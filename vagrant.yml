@@ -53,7 +53,7 @@
 
     - name: Install lxc-docker
       apt:
-        name: lxc-docker=1.4.1
+        name: lxc-docker
       notify: restart docker
 
     - name: Docker Daemon Options
